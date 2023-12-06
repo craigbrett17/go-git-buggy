@@ -13,14 +13,19 @@ func main() {
 	gitClient := clients.GitClient{}
 
 	fmt.Println("Cloning the repo")
-	repository, err := gitClient.Clone("temp", "craigbrett17", "go-git-buggy")
+	_, err := gitClient.Clone("temp", "craigbrett17", "go-git-buggy")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	fmt.Println("Cloned successfully")
 
-	// create a new branch
+	repository, err := gitClient.LoadFromDirectory("temp")
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
 	fmt.Println("Creating a new branch")
 	workTree, err := repository.Worktree()
 	if err != nil {
@@ -39,7 +44,6 @@ func main() {
 	}
 	fmt.Println("Branch created and checked out successfully")
 
-	// write a new test file and add it to the repo
 	fmt.Println("Creating a new file")
 	file, err := os.Create("temp/test_files/test_3.txt")
 	if err != nil {
@@ -64,6 +68,7 @@ func main() {
 	}
 	fmt.Println(status)
 
+	// echo out useful info for people looking for the problem
 	fmt.Println("You'll notice that a file is modified that hasn't been touched.")
 	fmt.Println("Try running `git status` in the temp directory to see the same thing.")
 	fmt.Println("Run git diff --cached to see the differences.")

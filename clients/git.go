@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
 )
@@ -20,6 +21,11 @@ func (c *GitClient) Clone(dir string, organisation string, repo string) (*git.Re
 	})
 
 	return repository, err
+}
+
+func (c *GitClient) LoadFromDirectory(dir string) (*git.Repository, error) {
+	fs := osfs.New(dir, osfs.WithBoundOS())
+	return git.PlainOpen(fs.Root())
 }
 
 func (c *GitClient) CreateBranch(worktree *git.Worktree, checkoutHash plumbing.Hash, branchName string, force bool) error {
