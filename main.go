@@ -10,15 +10,7 @@ import (
 )
 
 func main() {
-	token := ""
-	// replace token with the contents of GITHUB_TOKEN if in the env
-	if os.Getenv("GITHUB_TOKEN") != "" {
-		token = os.Getenv("GITHUB_TOKEN")
-	}
-
-	gitClient := clients.GitClient{
-		Token: token,
-	}
+	gitClient := clients.GitClient{}
 
 	fmt.Println("Cloning the repo")
 	repository, err := gitClient.Clone("temp", "craigbrett17", "go-git-buggy")
@@ -71,4 +63,9 @@ func main() {
 		return
 	}
 	fmt.Println(status)
+
+	fmt.Println("You'll notice that a file is modified that hasn't been touched.")
+	fmt.Println("Try running `git status` in the temp directory to see the same thing.")
+	fmt.Println("Run git diff --cached to see the differences.")
+	fmt.Println("When done, remove the temp directory before running again.")
 }
