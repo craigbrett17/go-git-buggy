@@ -25,7 +25,7 @@ func (c *GitClient) auth() transport.AuthMethod {
 }
 
 func (c *GitClient) Clone(dir string, organisation string, repo string) (*git.Repository, error) {
-	repositoryName := fmt.Sprintf("https://github.dns.ad.zopa.com/%s/%s.git", organisation, repo)
+	repositoryName := fmt.Sprintf("https://github.com/%s/%s.git", organisation, repo)
 	repository, err := git.PlainClone(dir, false, &git.CloneOptions{
 		Auth:     c.auth(),
 		URL:      repositoryName,
@@ -39,8 +39,8 @@ func (c *GitClient) Clone(dir string, organisation string, repo string) (*git.Re
 func (c *GitClient) Commit(workTree *git.Worktree, commitMessage string) (plumbing.Hash, error) {
 	return workTree.Commit(commitMessage, &git.CommitOptions{
 		Author: &object.Signature{
-			Name:  "Zopadev",
-			Email: "dev@zopa.com",
+			Name:  "Author McAuthorface",
+			Email: "author@github.com",
 			When:  time.Now(),
 		},
 	})
@@ -109,4 +109,13 @@ func (c *GitClient) AddFile(repository *git.Repository, path string) error {
 
 	_, err = worktree.Add(path)
 	return err
+}
+
+func (c *GitClient) GetStatus(repository *git.Repository) (git.Status, error) {
+	worktree, err := repository.Worktree()
+	if err != nil {
+		return nil, err
+	}
+
+	return worktree.Status()
 }
