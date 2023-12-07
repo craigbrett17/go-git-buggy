@@ -7,9 +7,15 @@ import (
 	"github.com/go-git/go-billy/v5/osfs"
 	"github.com/go-git/go-git/v5"
 	"github.com/go-git/go-git/v5/plumbing"
+	"github.com/go-git/go-git/v5/plumbing/cache"
+	"github.com/go-git/go-git/v5/storage/filesystem"
 )
 
+type ExperimentalFuncs struct {
+}
+
 type GitClient struct {
+	Experimental ExperimentalFuncs
 }
 
 func (c *GitClient) Clone(dir string, organisation string, repo string) (*git.Repository, error) {
@@ -54,4 +60,34 @@ func (c *GitClient) GetStatus(repository *git.Repository) (git.Status, error) {
 	}
 
 	return worktree.Status()
+}
+
+func (e ExperimentalFuncs) Clone(dir string, organisation string, repo string) (*git.Repository, error) {
+	fmt.Println("Using experimental clone")
+	repositoryName := fmt.Sprintf("https://github.com/%s/%s.git", organisation, repo)
+	wt := osfs.New(dir, osfs.WithBoundOS())
+	dotfs, err := wt.Chroot(git.GitDirName)
+	if err != nil {
+		return nil, err
+	}
+	store := filesystem.NewStorage(dotfs, cache.NewObjectLRUDefault())
+
+	repository, err := git.Clone(store, wt, &git.CloneOptions{
+		URL:      repositoryName,
+		Progress: os.Stdout,
+		Depth:    1,
+	})
+
+	return repository, err
+}
+
+func (e ExperimentalFuncs) LoadFromDirectory(dir string) (*git.Repository, error) {
+	fmt.Println("Using experimental load from directory")
+	wt := osfs.New(dir, osfs.WithBoundOS())
+	dotfs, err := wt.Chroot(git.GitDirName)
+	if err != nil {
+		return nil, err
+	}
+	store := filesystem.NewStorage(dotfs, cache.NewObjectLRUDefault())
+	return git.Open(store, wt)
 }

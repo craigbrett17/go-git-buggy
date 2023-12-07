@@ -10,17 +10,19 @@ import (
 )
 
 func main() {
-	gitClient := clients.GitClient{}
+	gitClient := clients.GitClient{
+		Experimental: clients.ExperimentalFuncs{}, // dummy struct to hold methods
+	}
 
 	fmt.Println("Cloning the repo")
-	_, err := gitClient.Clone("temp", "craigbrett17", "go-git-buggy")
+	_, err := gitClient.Experimental.Clone("temp", "craigbrett17", "go-git-buggy")
 	if err != nil {
 		fmt.Println(err)
 		return
 	}
 	fmt.Println("Cloned successfully")
 
-	repository, err := gitClient.LoadFromDirectory("temp")
+	repository, err := gitClient.Experimental.LoadFromDirectory("temp")
 	if err != nil {
 		fmt.Println(err)
 		return
